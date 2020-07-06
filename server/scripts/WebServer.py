@@ -6,26 +6,20 @@ class WebServer(BaseHTTPRequestHandler):
     serialManager = SerialManager()
     fileManager = FileManager()
 
-    def do_GET(self):
+    def do_POST(self):
         self.protocol_version = "HTTP/1.1"
         self.send_response(200)
         self.send_header("Content-Length", 0)
         self.end_headers()
 
         content_len = int(self.headers.get('Content-Length'))
-        post_body = self.rfile.read(content_len)
-        self.serialManager.sendAnimation(self.fileManager.readAnimation(post_body.decode("utf-8")), 0.2)
-        return
-
-    def do_POST(self):
-        self.protocol_version = "HTTP/1.1"
-        self.send_response(200)    
-        self.send_header("Content-Length", 0)    
-        self.end_headers()
-
-        content_len = int(self.headers.get('Content-Length'))
-        post_body = self.rfile.read(content_len)        
-        self.fileManager.saveAnimation(post_body.decode("utf-8"))        
+        body = self.rfile.read(content_len).decode("utf-8")
+        if(body.isnumeric() and len(body)):       
+            self.serialManager.sendData(body)
+        elif("\n" in body):
+            self.fileManager.saveAnimation(body.decode("utf-8"))
+        else:
+            self.serialManager.sendAnimation(self.fileManager.readAnimation(body), 0.2)
         return
 
 def run():
