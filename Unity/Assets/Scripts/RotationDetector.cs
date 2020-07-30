@@ -1,11 +1,7 @@
-﻿using System.Collections;
-using System.Net.Http;
-using UnityEngine;
-using UnityEngine.Networking;
+﻿using UnityEngine;
 
 public class RotationDetector : MonoBehaviour
 {
-
 #pragma warning disable 0649
     [SerializeField]
     private Axis axis;
@@ -15,41 +11,36 @@ public class RotationDetector : MonoBehaviour
     private bool reversed;
 #pragma warning restore 0649
 
-    private void Start()
+    public string Rotation()
     {
-        StartCoroutine(SendData());
-    }
-
-    private IEnumerator SendData()
-    {
-        string before = "090120120090060";
-        string after = "090120120090060060";
-        string content;
-        UnityWebRequest request;
-        while (true)
-        {
-            yield return new WaitForSeconds(10f);
-            content = before + Rotation() + after;
-            request = UnityWebRequest.Post("http://192.168.0.31:2727", content);
-            request.SendWebRequest();
-        }        
-    }
-
-    private string Rotation()
-    {
+        Vector3 inspectorRotation = UnityEditor.TransformUtils.GetInspectorRotation(transform);
         float rotation = 0f;
         switch (axis)
         {
             case Axis.X:
-                rotation = transform.localRotation.x;
+                rotation = inspectorRotation.x;
                 break;
             case Axis.Y:
-                rotation = transform.localRotation.y;
+                rotation = inspectorRotation.y;
                 break;
             case Axis.Z:
-                rotation = transform.localRotation.z;
+                rotation = inspectorRotation.z;
                 break;
         }
-        return Mathf.Round(rotation).ToString("000");
+        if (reversed)
+        {
+            rotation = 360f - rotation;
+        }
+        rotation += offset;
+        rotation = Mathf.RoundToInt(rotation);
+        if(rotation < 0f)
+        {
+            rotation = 0f;
+        }
+        if(rotation > 180f)
+        {
+            rotation = 180f;
+        }
+        return rotation.ToString("000");
     }
 }
