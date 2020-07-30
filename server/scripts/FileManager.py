@@ -10,7 +10,7 @@ class FileManager:
         while i < len(animationArray):
             if(i  == 0):
                 filename = animationArray[i]
-                filePath = self.location + filename
+                filePath = self.location + filename.strip()
                 self.removeFileIfExists(filePath)
                 animationFile = open(filePath, "x")
             else:

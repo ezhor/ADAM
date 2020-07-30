@@ -14,10 +14,10 @@ class WebServer(BaseHTTPRequestHandler):
 
         content_len = int(self.headers.get('Content-Length'))
         body = self.rfile.read(content_len).decode("utf-8")
-        if(body.isnumeric() and len(body)):       
+        if(body.isnumeric() and len(body) == 36):       
             self.serialManager.sendData(body)
         elif("\n" in body):
-            self.fileManager.saveAnimation(body.decode("utf-8"))
+            self.fileManager.saveAnimation(body)
         else:
             self.serialManager.sendAnimation(self.fileManager.readAnimation(body), 0.2)
         return
